@@ -1,46 +1,38 @@
-```markdown
 # node-sqs-producer
 
-**A standard software project.**
+Small Express + TypeScript service that publishes messages to an AWS SQS
+queue using [`sqs-producer`](https://www.npmjs.com/package/sqs-producer).
 
-**Installation:**
+## Setup
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/your-username/node-sqs-producer.git
-    ```
-2.  **Install Dependencies:**
-    ```bash
-    cd node-sqs-producer
-    yarn install
-    ```
-3.  **Configure .env (optional):**
-    ```bash
-    yarn env init
-    ```
-4.  **Set up .gitignore:**  (Assuming you have a .gitignore file already)
-
-**Usage:**
-
-*   **Connect to SQS:**
-    *   Configure your AWS credentials using the `.env` file (if present).
-    *   Use the `sqs` library to interact with your SQS queue.
-
-*   **Process Messages:**
-    *   The `process_message` function takes a message object and returns a processed message.
-    *   Example:
-        ```python
-        def process_message(message):
-            print(f"Received message: {message}")
-            # Perform your processing logic here
-            return message  # Return the processed message
-        ```
-
-*   **Example Workflow:**
-    1.  **Connect:** Establish a connection to your SQS queue.
-    2.  **Consume:**  Subscribe to the queue you want to monitor.
-    3.  **Process:**  Iterate through messages and apply your logic to each message.
-    4.  **Consume:**  Discard processed messages.
-
-*   **Documentation:**  Refer to the `docs/` directory for detailed usage examples.
+```bash
+yarn install
 ```
+
+## Configuration
+
+Settings are read from environment variables. Optionally they can be placed
+in `envs/.env-<NODE_ENV>` (e.g. `envs/.env-development`), which is loaded
+at startup when present.
+
+| Variable | Description |
+|---|---|
+| `AWS_REGION` | AWS region of the queue |
+| `AWS_ACCESS_KEY_ID` | AWS access key |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key |
+| `AWS_QUEUE_URL` | URL of the target SQS queue |
+| `AWS_BATCH_SIZE` | Batch size used by the producer |
+| `PORT` | HTTP port (default `9000`) |
+
+## Usage
+
+Start the server (for example with `NODE_ENV=development npx ts-node src/index.ts`)
+and call the root route:
+
+```bash
+curl http://localhost:9000/
+```
+
+`GET /` sends `{"message":"hello"}` to the queue (JSON-serialized as the
+message body, with a generated UUID as id) and returns the same payload.
+If SQS rejects the message, the endpoint answers `502`.
